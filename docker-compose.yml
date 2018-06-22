@@ -1,0 +1,31 @@
+version: '3'
+services:
+  react-cli:
+    container_name: react-cli
+    build: ./Dockerfiles/php
+    volumes:
+      - ./applications:/var/www/html/
+      - ./configs/php/log.conf:/usr/local/etc/php-fpm.d/zz-log.conf
+      - ./configs/php/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - react-php
+    expose:
+      - "9000"
+  react-db:
+    container_name: react-db
+    image: mysql:5.7
+    volumes:
+      - ./sql/:/docker-entrypoint-initdb.d
+      - ./configs/mysql/collation.cnf:/etc/mysql/conf.d/collation.cnf
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3312:3306"
+    expose:
+      - "3306"
+    networks:
+      - react-php
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: 'mds_en'
+networks:
+  react-php:
